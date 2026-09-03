@@ -108,7 +108,6 @@ jobs:
             p/owasp-top-ten
             p/spring
             p/typescript
-          generateSarif: "1"
         continue-on-error: true
 
       - name: 📤 Upload Semgrep SARIF Results
@@ -119,10 +118,10 @@ jobs:
         continue-on-error: true
 
   # =========================================================================
-  # 3. PHASE 2B: SECRET SCANNING (Betterleaks)
+  # 3. PHASE 2B: SECRET SCANNING (Gitleaks)
   # =========================================================================
   secret-scanning:
-    name: 🔑 Secret Leak Detection (Betterleaks)
+    name: 🔑 Secret Leak Detection (Gitleaks)
     needs: test
     runs-on: ubuntu-latest
 
@@ -132,10 +131,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🔍 Scan for Leaked Secrets with Betterleaks
-        uses: dortort/betterleaks-action@v1
-        with:
-          args: --verbose --redact
+      - name: 🔍 Scan for Leaked Secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
   # =========================================================================
@@ -206,12 +205,16 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonar.fchicout.dev' }}
         run: |
-          echo "Iniciando análise estática e verificação do Quality Gate no SonarQube..."
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.host.url="${SONAR_HOST_URL}" \
-            -Dsonar.token="${SONAR_TOKEN}" \
-            -Dsonar.coverage.jacoco.xmlReportPaths="backend/target/site/jacoco/jacoco.xml" \
-            -Dsonar.qualitygate.wait=true
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "⚠️ SONAR_TOKEN não configurado nos segredos do repositório. Análise SonarQube opcional concluída."
+          else
+            echo "Iniciando análise estática e verificação do Quality Gate no SonarQube..."
+            mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+              -Dsonar.host.url="${SONAR_HOST_URL}" \
+              -Dsonar.token="${SONAR_TOKEN}" \
+              -Dsonar.coverage.jacoco.xmlReportPaths="backend/target/site/jacoco/jacoco.xml" \
+              -Dsonar.qualitygate.wait=true
+          fi
 
   # =========================================================================
   # 6. PHASE 4A: DAST FOR DEVELOPMENT/STAGING (ProjectDiscovery Nuclei)

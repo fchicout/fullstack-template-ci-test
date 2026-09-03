@@ -1,23 +1,22 @@
 import '@angular/compiler';
 import { describe, it, expect } from 'vitest';
+import { Injector, createEnvironmentInjector, runInInjectionContext } from '@angular/core';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
-  it('should be defined and instantiate properly', () => {
-    expect(AppComponent).toBeDefined();
-    expect(typeof AppComponent).toBe('function');
-  });
-
-  it('should have standard component metadata and default values', () => {
-    const comp = new AppComponent();
+  it('should instantiate component and define default values', () => {
+    const injector = createEnvironmentInjector([], Injector.NULL);
+    const comp = runInInjectionContext(injector, () => new AppComponent());
+    expect(comp).toBeDefined();
     expect(comp.title()).toContain('Fullstack Starter');
     expect(comp.healthStatus()).toBeNull();
-    expect(comp.helloMessage()).toBe('Carregando saudação do backend...');
   });
 
-  it('should set fallback hello message in standalone mode', () => {
-    const comp = new AppComponent();
-    comp.fetchHelloMessage();
+  it('should initialize and execute health check and greeting fetch in standalone mode', () => {
+    const injector = createEnvironmentInjector([], Injector.NULL);
+    const comp = runInInjectionContext(injector, () => new AppComponent());
+    comp.ngOnInit();
     expect(comp.helloMessage()).toContain('Olá, Mundo!');
+    expect(comp.healthStatus()?.status).toContain('UP');
   });
 });

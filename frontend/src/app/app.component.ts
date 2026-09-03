@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, Optional, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
@@ -28,11 +28,11 @@ export interface HelloWorldResponse {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  private http = inject(HttpClient, { optional: true });
+
   title = signal('Fullstack Starter (Spring Boot 3 + Angular)');
   healthStatus = signal<HealthStatus | null>(null);
   helloMessage = signal<string>('Carregando saudação do backend...');
-
-  constructor(@Optional() private http?: HttpClient) {}
 
   ngOnInit(): void {
     this.checkBackendHealth();
