@@ -1,11 +1,24 @@
 <div class="container">
   <header class="header">
-    <div class="badge">SENAC Fullstack Extension 2026.2 &bull; Angular 22 Zoneless</div>
+    <div class="badge">SENAC Fullstack Extension 2026.2 &bull; Enterprise Starter</div>
     <h1>{{ title() }}</h1>
     <p class="subtitle">Scaffolding com Quality Gates no SonarQube & Pipelines GitHub Actions</p>
   </header>
 
   <main class="content-grid">
+    <!-- Hello World Card -->
+    <div class="card hello-card">
+      <div class="card-header">
+        <span class="dot online"></span>
+        <h2>🎉 Hello World API Integration</h2>
+      </div>
+      <div class="card-body">
+        <p class="hello-text">{{ helloMessage() }}</p>
+        <div class="endpoint-badge">GET /api/v1/hello &bull; HTTP 200 OK</div>
+      </div>
+    </div>
+
+    <!-- Backend Health Status Card -->
     <div class="card status-card">
       <div class="card-header">
         <span class="dot" [class.online]="healthStatus()?.status === 'UP'"></span>
@@ -39,7 +52,7 @@
       <h2>Pilares de Engenharia & Qualidade</h2>
       <ul class="features-list">
         <li><strong>Backend:</strong> Java 21 LTS, Spring Boot 3.3, ArchUnit, JaCoCo</li>
-        <li><strong>Frontend:</strong> Angular 22 (Zoneless, Signals, OnPush, Vitest)</li>
+        <li><strong>Frontend:</strong> Angular 18 LTS (Signals, Standalone, OnPush, Vitest)</li>
         <li><strong>Quality Gate:</strong> SonarQube em <a href="https://sonar.fchicout.dev" target="_blank">sonar.fchicout.dev</a></li>
         <li><strong>CI/CD:</strong> GitHub Actions (Branch <code>development</code> &rarr; Staging, <code>main</code> &rarr; Produção)</li>
       </ul>

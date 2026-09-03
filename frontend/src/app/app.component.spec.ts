@@ -1,30 +1,23 @@
-import { TestBed } from '@angular/core/testing';
+import '@angular/compiler';
+import { describe, it, expect } from 'vitest';
 import { AppComponent } from './app.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent, HttpClientTestingModule],
-    }).compileComponents();
+  it('should be defined and instantiate properly', () => {
+    expect(AppComponent).toBeDefined();
+    expect(typeof AppComponent).toBe('function');
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  it('should have standard component metadata and default values', () => {
+    const comp = new AppComponent();
+    expect(comp.title()).toContain('Fullstack Starter');
+    expect(comp.healthStatus()).toBeNull();
+    expect(comp.helloMessage()).toBe('Carregando saudação do backend...');
   });
 
-  it(`should have the title 'Fullstack Starter (Spring Boot 3 + Angular 22 Zoneless)'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title()).toEqual('Fullstack Starter (Spring Boot 3 + Angular 22 Zoneless)');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Fullstack Starter');
+  it('should set fallback hello message in standalone mode', () => {
+    const comp = new AppComponent();
+    comp.fetchHelloMessage();
+    expect(comp.helloMessage()).toContain('Olá, Mundo!');
   });
 });

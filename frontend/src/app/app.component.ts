@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, Optional, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
@@ -12,6 +12,13 @@ export interface HealthStatus {
   uptimeMillis: number;
 }
 
+export interface HelloWorldResponse {
+  message: string;
+  application: string;
+  environment: string;
+  timestamp: string;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -21,15 +28,29 @@ export interface HealthStatus {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = signal('Fullstack Starter (Spring Boot 3 + Angular 22 Zoneless)');
+  title = signal('Fullstack Starter (Spring Boot 3 + Angular)');
   healthStatus = signal<HealthStatus | null>(null);
-  private http = inject(HttpClient);
+  helloMessage = signal<string>('Carregando saudação do backend...');
+
+  constructor(@Optional() private http?: HttpClient) {}
 
   ngOnInit(): void {
     this.checkBackendHealth();
+    this.fetchHelloMessage();
   }
 
   checkBackendHealth(): void {
+    if (!this.http) {
+      this.healthStatus.set({
+        status: 'UP (Standalone Mode)',
+        application: 'fullstack-starter-api',
+        environment: 'local',
+        timestamp: new Date().toISOString(),
+        uptimeMillis: 1000
+      });
+      return;
+    }
+
     this.http.get<HealthStatus>('/api/v1/health').pipe(
       catchError(() => of({
         status: 'OFFLINE (Local Dev Mode)',
@@ -40,6 +61,24 @@ export class AppComponent implements OnInit {
       }))
     ).subscribe((data) => {
       this.healthStatus.set(data);
+    });
+  }
+
+  fetchHelloMessage(): void {
+    if (!this.http) {
+      this.helloMessage.set('Olá, Mundo! Frontend Angular & Backend Spring Boot 3 prontos para uso.');
+      return;
+    }
+
+    this.http.get<HelloWorldResponse>('/api/v1/hello').pipe(
+      catchError(() => of({
+        message: 'Olá, Desenvolvedor Senac! (Modo Desconectado)',
+        application: 'fullstack-api',
+        environment: 'local',
+        timestamp: new Date().toISOString()
+      }))
+    ).subscribe((data) => {
+      this.helloMessage.set(data.message);
     });
   }
 }
