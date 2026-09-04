@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -41,7 +41,7 @@ jobs:
           cache: 'maven'
 
       - name: 📦 Setup Node.js 22 LTS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: 'npm'
@@ -71,7 +71,7 @@ jobs:
           npm run test:coverage --if-present || npm run test --if-present
 
       - name: 📤 Upload JaCoCo Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-coverage-report
           path: backend/target/site/jacoco/jacoco.xml
@@ -82,7 +82,7 @@ jobs:
           mvn -B package -DskipTests -f backend/pom.xml
 
       - name: 📤 Upload Backend JAR Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-jar
           path: backend/target/*.jar
@@ -98,7 +98,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 🛡️ Run Semgrep SAST Scan (OWASP Top 10 & Security Rules)
         run: |
@@ -126,7 +126,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -146,7 +146,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📜 Generate SBOM with Syft
         run: |
@@ -175,7 +175,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -187,7 +187,7 @@ jobs:
           cache: 'maven'
 
       - name: 📥 Download JaCoCo Coverage Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: jacoco-coverage-report
           path: backend/target/site/jacoco
@@ -219,7 +219,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: ☕ Setup Java 21 LTS
         uses: actions/setup-java@v5
@@ -228,7 +228,7 @@ jobs:
           java-version: '21'
 
       - name: 📥 Download Backend JAR
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: backend-jar
           path: target
@@ -245,8 +245,7 @@ jobs:
       - name: 🎯 Execute Nuclei DAST Scan (Vulnerabilities, Misconfigurations & API Flaws)
         uses: projectdiscovery/nuclei-action@v3
         with:
-          target: 'http://localhost:8080'
-          flags: '-tags cve,misconfig,exposure,tech -severity critical,high,medium -silent'
+          args: '-u http://localhost:8080 -tags cve,misconfig,exposure,tech -severity critical,high,medium -silent'
         continue-on-error: true
 
   # =========================================================================
@@ -260,7 +259,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: ☕ Setup Java 21 LTS
         uses: actions/setup-java@v5
@@ -269,7 +268,7 @@ jobs:
           java-version: '21'
 
       - name: 📥 Download Backend JAR
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: backend-jar
           path: target
@@ -303,7 +302,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📦 Packaging Staging Artifacts
         run: |
@@ -328,7 +327,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📦 Packaging Production Release
         run: |
@@ -340,4 +339,5 @@ jobs:
       - name: 🚢 Production Deploy Hook
         run: |
           echo "✅ Deploy em Produção finalizado com sucesso."
+
 
