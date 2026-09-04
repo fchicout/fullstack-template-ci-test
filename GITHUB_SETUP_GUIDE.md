@@ -196,6 +196,40 @@ flowchart TD
 
 ## ⚙️ Configuração dos Secrets no Repositório GitHub
 
-Cadastre os seguintes segredos em **Settings &rarr; Secrets and variables &rarr; Actions**:
-* **`SONAR_TOKEN`** *(Obrigatório)*: Token de análise de projeto gerado no SonarQube ([https://sonar.fchicout.dev](https://sonar.fchicout.dev)).
-* **`SONAR_HOST_URL`** *(Opcional, padrão no workflow)*: `https://sonar.fchicout.dev`.
+Para que o pipeline do GitHub Actions consiga enviar os relatórios para o SonarQube e validar o Quality Gate, o líder da equipe deve cadastrar os seguintes segredos no repositório:
+
+### 1. Provisionamento do Projeto no SonarQube (`sonar.fchicout.dev`)
+1. Acesse [**https://sonar.fchicout.dev**](https://sonar.fchicout.dev) e efetue login com suas credenciais.
+2. Clique em **Projects &rarr; Create Project &rarr; Manually**.
+3. Defina o **Project display name** (ex: `Fullstack - Equipe DaMatch`) e o **Project key** (ex: `senac-fullstack-damatch`).
+   *(Certifique-se de que o Project Key seja idêntico ao `<sonar.projectKey>` no `pom.xml` da raiz).*
+4. Defina a **Main branch** como `main` e clique em **Set Up** &rarr; selecione **With GitHub Actions**.
+5. Acesse **My Account &rarr; Security &rarr; Generate Tokens**, gere um token do tipo **Project Analysis Token** e copie o valor gerado.
+
+### 2. Cadastro no GitHub Secrets
+1. No repositório GitHub da equipe, acesse: **Settings &rarr; Secrets and variables &rarr; Actions**.
+2. Clique em **New repository secret** e adicione:
+   - **`SONAR_TOKEN`** *(Obrigatório)*: Token gerado no SonarQube.
+   - **`SONAR_HOST_URL`** *(Opcional)*: `https://sonar.fchicout.dev`.
+3. Em **Settings &rarr; Actions &rarr; General &rarr; Workflow permissions**, selecione **Read and write permissions** e salve.
+
+---
+
+## 🛡️ Regras de Proteção de Branches no GitHub (Branch Protection Rules)
+
+Para garantir que o código só entre nas branches principais após aprovação do Quality Gate:
+
+1. Acesse **Settings &rarr; Branches &rarr; Add branch protection rule**.
+2. **Para a branch `development`:**
+   - **Branch name pattern:** `development`
+   - Marque: **Require a pull request before merging** (Require 1 approval).
+   - Marque: **Require status checks to pass before merging**:
+     - `🧪 Lint & Automated Tests`
+     - `🛡️ SonarQube Quality Gate`
+     - `🔒 SAST - Semgrep Security Audit`
+     - `📦 Supply Chain - Syft (SBOM) & Grype (CVEs)`
+   - Marque: **Require branches to be up to date before merging**.
+3. **Para a branch `main`:**
+   - **Branch name pattern:** `main`
+   - Marque as mesmas travas e restrinja merges apenas a PRs vindos de `development` ou tags de release.
+
